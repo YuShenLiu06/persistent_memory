@@ -166,7 +166,7 @@ eg:
 ```
 对应的类/abc/abcd/abcdef.jar
 
-对应的文档/Docs/abc/abcd/abcdef.md
+对应的文档/Docs/{文档类型}/abc/abcd/abcdef.md
 ```
 
 参考[文档模板](#文档模板)根据上一步确定的类型，必须阅读对应的文档类型的模板来进行创建
@@ -211,7 +211,7 @@ eg:
   ```
   对应的类/abc/abcd/abcdef.jar
 
-  对应的文档/Docs/abc/abcd/abcdef.md
+  对应的文档/Docs/{文档类型}/abc/abcd/abcdef.md
   ```
   来更新位置
   
