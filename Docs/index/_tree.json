@@ -1,0 +1,64 @@
+{
+  "version": "1.0.0",
+  "last_updated": "2026-03-04",
+  "categories": {
+    "api": {
+      "name": "API 文档",
+      "description": "项目 API 接口文档",
+      "path": "api/",
+      "documents": []
+    },
+    "module": {
+      "name": "模块文档",
+      "description": "项目模块和组件文档",
+      "path": "module/",
+      "documents": []
+    },
+    "design": {
+      "name": "设计文档",
+      "description": "项目架构和设计决策文档",
+      "path": "../",
+      "documents": [
+        {
+          "filename": "implementation-plan.md",
+          "title": "实现方案",
+          "description": "项目实现方案总结"
+        },
+        {
+          "filename": "implementation-analysis.md",
+          "title": "实现分析",
+          "description": "多种实现方法利弊分析"
+        },
+        {
+          "filename": "claude-code-architecture.md",
+          "title": "Claude Code 架构参考",
+          "description": "Claude Code 记忆系统架构"
+        },
+        {
+          "filename": "hook.md",
+          "title": "Hook 配置参考",
+          "description": "Stop Hook 详细配置参考"
+        }
+      ]
+    },
+    "skill": {
+      "name": "SKILL 文档",
+      "description": "Claude Code SKILL 定义文件",
+      "path": "../.claude/skills/",
+      "documents": [
+        {
+          "filename": "persistent-context/SKILL.md",
+          "title": "persistent-context",
+          "description": "文档维护和更新工作流程",
+          "tags": ["核心", "文档维护"]
+        },
+        {
+          "filename": "doc-navigation/SKILL.md",
+          "title": "doc-navigation",
+          "description": "文档查找和导航流程",
+          "tags": ["核心", "文档导航"]
+        }
+      ]
+    }
+  }
+}

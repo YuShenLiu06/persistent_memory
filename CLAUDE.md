@@ -39,6 +39,33 @@
 
 ---
 
+## 常用模块/API
+
+> 详细文档索引见 [Docs/index/index.md](Docs/index/index.md)
+
+### 核心 SKILL 组件
+
+| SKILL | 路径 | 说明 |
+|-------|------|------|
+| persistent-context | `.claude/skills/persistent-context/SKILL.md` | 文档维护和更新工作流程 |
+| doc-navigation | `.claude/skills/doc-navigation/SKILL.md` | 文档查找和导航流程 |
+
+### 文档模板
+
+| 模板 | 路径 | 用途 |
+|------|------|------|
+| CLAUDE.md | `.claude/skills/persistent-context/templates/claude-md.template.md` | 主记忆文件模板 |
+| API 文档 | `.claude/skills/persistent-context/templates/api-doc.template.md` | API 接口文档模板 |
+| 模块文档 | `.claude/skills/persistent-context/templates/module-doc.template.md` | 模块/组件文档模板 |
+
+### 安装脚本
+
+| 脚本 | 路径 | 说明 |
+|------|------|------|
+| Hook 安装 | `scripts/install-hook.js` | Stop Hook 安装脚本 |
+
+---
+
 ## 项目结构概览
 
 ```
@@ -46,6 +73,11 @@ persistent_memory/
 ├── CLAUDE.md              # 主记忆文件（本文件）
 ├── README.md              # 项目主文档
 ├── Docs/                  # 详细文档目录
+│   ├── index/             # 文档索引目录
+│   │   ├── _tree.json     # 索引结构数据
+│   │   └── index.md       # 文档导航索引
+│   ├── api/               # API 文档目录
+│   ├── module/            # 模块文档目录
 │   ├── implementation-plan.md    # 实现方案文档
 │   ├── implementation-analysis.md # 实现分析文档
 │   ├── claude-code-architecture.md # Claude Code 架构参考
@@ -58,13 +90,15 @@ persistent_memory/
 └── .claude/               # Claude Code 配置（可部署到 ~/.claude/）
     ├── settings.local.json
     ├── skills/
-    │   └── persistent-context/    # 核心 SKILL
-    │       ├── SKILL.md           # 文档更新工作流程
-    │       ├── README.md          # 使用说明
-    │       └── templates/         # 文档模板
-    │           ├── claude-md.template.md
-    │           ├── api-doc.template.md
-    │           └── module-doc.template.md
+    │   ├── persistent-context/    # 文档维护 SKILL
+    │   │   ├── SKILL.md           # 文档更新工作流程
+    │   │   ├── README.md          # 使用说明
+    │   │   └── templates/         # 文档模板
+    │   │       ├── claude-md.template.md
+    │   │       ├── api-doc.template.md
+    │   │       └── module-doc.template.md
+    │   └── doc-navigation/        # 文档导航 SKILL
+    │       └── SKILL.md           # 文档查找和导航流程
     ├── rules/
     │   └── memory-loading.md      # 强制加载规则
     └── hooks/
@@ -74,6 +108,8 @@ persistent_memory/
 ---
 
 ## 技术文档索引
+
+> **快速导航**: [Docs/index/index.md](Docs/index/index.md) - 完整文档索引
 
 ### 项目文档
 | 文档 | 路径 | 说明 |
@@ -151,19 +187,46 @@ persistent_memory/
   - Shell 脚本：跨平台兼容性差
   - 手动配置：容易出错，不便于维护
 
+### ADR-007: 创建 doc-navigation SKILL
+- **日期**: 2026-03-04
+- **决策**: 创建独立的 doc-navigation SKILL 用于文档查找和导航
+- **原因**:
+  - 职责分离：persistent-context 负责维护，doc-navigation 负责查找
+  - 可复用性：其他项目可以单独使用文档导航功能
+  - 遵循单一职责原则
+- **协作关系**:
+  - memory-loading (Rule): 会话开始时强制加载 CLAUDE.md
+  - doc-navigation (SKILL): 通过索引查找和定位文档
+  - persistent-context (SKILL): 维护和更新文档索引
+
 ---
 
 ## 当前任务状态
 
 **已完成**：
 - 核心 SKILL、Rules、Hooks 实现
+  - `persistent-context`: 文档维护和更新
+  - `doc-navigation`: 文档查找和导航
+  - `memory-loading`: 强制加载 CLAUDE.md
 - 项目 README.md 文档
 - Stop Hook 安装脚本 (`scripts/install-hook.js`)
+- 文档存储结构 (`Docs/api/`, `Docs/module/`, `Docs/index/`)
+- 文档索引系统 (`_tree.json`, `index.md`)
+
+**三组件协作关系**：
+```
+会话开始 → memory-loading (Rule) 加载 CLAUDE.md
+     ↓
+查找文档 → doc-navigation (SKILL) 使用索引定位
+     ↓
+更新文档 → persistent-context (SKILL) 维护索引
+```
 
 **可部署**：
 ```bash
 # 安装 SKILL 和 Rule
 cp -r .claude/skills/persistent-context ~/.claude/skills/
+cp -r .claude/skills/doc-navigation ~/.claude/skills/
 cp .claude/rules/memory-loading.md ~/.claude/rules/
 
 # 安装 Stop Hook（可选）
@@ -175,7 +238,8 @@ node scripts/install-hook.js
 - [x] 手动执行 `/persistent-context` 验证工作流程 ✅ 2026-03-04
 - [x] Stop Hook 工作正常 ✅ 2026-03-04
 - [x] 安装脚本功能完整 ✅ 2026-03-04
+- [x] doc-navigation SKILL 创建完成 ✅ 2026-03-04
 
 ---
 
-*最后更新: 2026-03-04 (persistent-context 更新)*
+*最后更新: 2026-03-04 (新增 doc-navigation SKILL，完善三组件协作架构)*
