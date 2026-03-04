@@ -44,12 +44,17 @@
 ```
 persistent_memory/
 ├── CLAUDE.md              # 主记忆文件（本文件）
+├── README.md              # 项目主文档
 ├── Docs/                  # 详细文档目录
 │   ├── implementation-plan.md    # 实现方案文档
 │   ├── implementation-analysis.md # 实现分析文档
 │   ├── claude-code-architecture.md # Claude Code 架构参考
+│   ├── hook.md            # Hook 配置参考
 │   ├── 简要.canvas        # 项目规划画布
 │   └── .obsidian/         # Obsidian 配置（禁止修改）
+├── scripts/               # 安装和维护脚本
+│   ├── install-hook.js    # Stop Hook 安装脚本
+│   └── README.md          # 脚本使用说明
 └── .claude/               # Claude Code 配置（可部署到 ~/.claude/）
     ├── settings.local.json
     ├── skills/
@@ -63,12 +68,18 @@ persistent_memory/
     ├── rules/
     │   └── memory-loading.md      # 强制加载规则
     └── hooks/
-        └── stop-hook-prompt.md    # 会话结束提醒（可选）
+        └── stop-hook-prompt.md    # Hook 文档说明
 ```
 
 ---
 
 ## 技术文档索引
+
+### 项目文档
+| 文档 | 路径 | 说明 |
+|------|------|------|
+| 项目 README | `README.md` | 项目概述、安装、使用指南 |
+| 脚本说明 | `scripts/README.md` | 安装脚本使用说明 |
 
 ### 设计文档
 | 文档 | 路径 | 说明 |
@@ -76,6 +87,7 @@ persistent_memory/
 | 实现方案 | `Docs/implementation-plan.md` | 项目实现方案总结 |
 | 实现分析 | `Docs/implementation-analysis.md` | 多种实现方法利弊分析 |
 | 架构参考 | `Docs/claude-code-architecture.md` | Claude Code 记忆系统架构 |
+| Hook 配置 | `Docs/hook.md` | Stop Hook 详细配置参考 |
 
 ### 规划文档
 | 文档 | 路径 | 说明 |
@@ -101,6 +113,7 @@ persistent_memory/
   - 更好的跨平台兼容性
   - 提醒 AI 而非执行脚本，更灵活
   - 降低维护成本
+- **响应格式**: `{"ok": true}` 或 `{"ok": false, "reason": "..."}`（注意：使用 `ok` 字段而非 `decision`）
 
 ### ADR-003: 大型重构由用户手动触发
 - **日期**: 2026-03-04
@@ -126,22 +139,43 @@ persistent_memory/
   - 降低用户学习成本
   - 符合 Claude Code 社区惯例
 
+### ADR-006: 使用 Node.js 安装脚本
+- **日期**: 2026-03-04
+- **决策**: 使用 Node.js 脚本 (`scripts/install-hook.js`) 安装 Stop Hook
+- **原因**:
+  - 跨平台兼容性（Windows/macOS/Linux）
+  - 无需额外依赖（仅使用 Node.js 内置模块）
+  - 支持预览模式和强制重装
+  - 自动备份原有配置
+- **替代方案**:
+  - Shell 脚本：跨平台兼容性差
+  - 手动配置：容易出错，不便于维护
+
 ---
 
 ## 当前任务状态
 
-**已完成**：核心 SKILL、Rules、Hooks 实现完成
+**已完成**：
+- 核心 SKILL、Rules、Hooks 实现
+- 项目 README.md 文档
+- Stop Hook 安装脚本 (`scripts/install-hook.js`)
 
 **可部署**：
 ```bash
+# 安装 SKILL 和 Rule
 cp -r .claude/skills/persistent-context ~/.claude/skills/
 cp .claude/rules/memory-loading.md ~/.claude/rules/
+
+# 安装 Stop Hook（可选）
+node scripts/install-hook.js
 ```
 
-**待验证**：
-- [ ] 新会话验证 CLAUDE.md 自动加载
-- [ ] 手动执行 `/update-memory` 验证工作流程
+**验证清单**：
+- [x] 新会话验证 CLAUDE.md 自动加载 ✅ 2026-03-04
+- [x] 手动执行 `/persistent-context` 验证工作流程 ✅ 2026-03-04
+- [x] Stop Hook 工作正常 ✅ 2026-03-04
+- [x] 安装脚本功能完整 ✅ 2026-03-04
 
 ---
 
-*最后更新: 2026-03-04*
+*最后更新: 2026-03-04 (persistent-context 更新)*

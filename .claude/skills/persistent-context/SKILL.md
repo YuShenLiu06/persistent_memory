@@ -2,7 +2,7 @@
 name: persistent-context
 description: |
   AI自主维护项目记忆文件，实现跨会话知识持久化。
-  当需要更新CLAUDE.md、记录架构决策、维护技术文档索引时使用。
+  当需要更新CLAUDE.md、记录架构决策、维护技术文档索引、对话即将结束时使用。
   触发关键词：update-memory, 记录, 文档更新, 架构决策, ADR
 ---
 
