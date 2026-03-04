@@ -171,12 +171,16 @@ eg:
 
 参考[文档模板](#文档模板)根据上一步确定的类型，必须阅读对应的文档类型的模板来进行创建
 
-### 更新CLAUDE.md
+### 触发索引维护
+
+触发[索引维护](#索引维护)流程，完成对index.md以及_tree.json的更新
+
+<!-- ### 更新CLAUDE.md
 
 将新增的文档作为索引，更新至CLAUDE.md中的"技术文档索引"段落其中必须包含
 
 - 文档摘要
-- 文档地址
+- 文档地址 -->
 
 ## 文档更新
 
@@ -190,7 +194,7 @@ eg:
 
 ### 判断是否需要更改摘要以及储存位置
 
-#### 更改CLAUDE.md 中的文档摘要
+#### 更新index.md 以及CLAUDE.md的快速索引(如果存在)
 
 只有发生了以下情况，你才需要更改摘要
 
@@ -274,12 +278,76 @@ Docs/
 }
 ```
 
+### index.md 结构规范
+
+#### 模板参考
+
+使用 [index 模板](templates\index.template.md) 生成 `Docs/index/index.md` 文件。
+
+#### 占位符变量
+
+| 变量 | 说明 | 来源 |
+|------|------|------|
+| `{categories_content}` | 所有分类的文档列表内容 | 根据 `_tree.json` 自动生成 |
+| `{version}` | 索引版本号 | `_tree.json.version` |
+| `{last_updated}` | 最后更新日期 | `_tree.json.updated` |
+
+#### 分类内容生成规则
+
+根据 `_tree.json` 中的 `categories` 数组，按以下格式生成分类内容：
+
+**有文档的分类**：
+```markdown
+## {category.name}
+
+> 路径: `{category.path}`
+
+| 文档 | 说明 | 标签 |
+|------|------|------|
+| [{document.name}]({相对路径}) | {document.description} | {document.tags} |
+```
+
+**无文档的分类**：
+```markdown
+## {category.name}
+
+> 路径: `{category.path}`
+
+| 文档 | 说明 |
+|------|------|
+| *暂无文档* | - |
+```
+
+#### 标签系统
+
+标签用于快速识别文档类型和用途：
+
+| 标签 | 说明 |
+|------|------|
+| `核心` | 核心组件或关键文档 |
+| `API` | API 接口文档 |
+| `模块` | 模块或组件文档 |
+| `设计` | 架构设计文档 |
+| `配置` | 配置相关文档 |
+
 ### 索引更新规则
+
+#### _tree.json 更新
 
 1. **新增文档** - 在对应分类的 `documents` 数组中添加条目
 2. **删除文档** - 从数组中移除条目
 3. **修改文档** - 仅更新描述或标签，不修改文件名
 4. **新增分类** - 在 `categories` 数组中添加新分类对象
+
+#### index.md 同步
+
+当 `_tree.json` 发生变更时，**必须同步更新** `index.md`：
+
+1. 读取 `_tree.json` 获取最新数据
+2. 根据 [分类内容生成规则](#分类内容生成规则) 生成内容
+3. 替换 `{categories_content}` 占位符
+4. 更新 `{version}` 和 `{last_updated}` 变量
+5. 保持索引结构表格不变
 
 ---
 
@@ -312,6 +380,7 @@ Docs/
 | `claude-md.template.md` | CLAUDE.md 主记忆文件模板 |
 | `api-doc.template.md` | API 文档模板 |
 | `module-doc.template.md` | 模块文档模板 |
+| `index.template.md` | 文档索引页面模板 |
 
 使用模板时，复制模板内容并根据项目实际情况填写。
 
