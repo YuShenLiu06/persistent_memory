@@ -1,0 +1,23 @@
+{
+  "permissions": {
+    "allow": [
+      "mcp__web-reader__webReader",
+      "WebSearch",
+      "Bash(python3:*)",
+      "mcp__web-search-prime__webSearchPrime"
+    ]
+  },
+  "hooks": {
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash \"$CLAUDE_PROJECT_DIR\"/.claude/hooks/stop-hook.sh",
+            "timeout": 10
+          }
+        ]
+      }
+    ]
+  }
+}
