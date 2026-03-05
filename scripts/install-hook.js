@@ -34,7 +34,7 @@ const STOP_HOOK_CONFIG = {
   hooks: [
     {
       type: 'prompt',
-      prompt: '根据是否主动更新文档(执行/persistent-context)了评判此轮会话是否应该结束，概论对话状况如下: $ARGUMENTS. 如果有设计函数类型，参数，方法，新增函数、功能等内容没有被即使更新至文档，分析过后判断是否能退出，回复以下json内容"{\\"ok\\": false|true, \\"reason\\": \\"your explanation\\"}"false或者true由你自行判断是否文档处于最新状态能否结束对话来决定。这里提供一个例子{\\"ok\\": true, \\"reason\\": \\"文档已经最新\\"} 不要回复以外的任何词语，同时也不要解释'
+      prompt: '根据是否主动更新文档(执行/persistent-context)了评判此轮会话是否应该结束，概论对话状况如下: $ARGUMENTS. 如果有设计函数类型，参数，方法、用户偏好、项目偏好、新增函数、功能等内容没有被即使更新至文档，分析过后判断是否能退出，如果可以退出回复以下json内容“{\"ok\": true, \"reason\": \"文档已经最新\"}”如果需要更新的话回复“{\"ok\": false, \"reason\": \"/persistent-context <需要更新的部分>\"}不要回复以外的任何词语，同时也不要解释'
     }
   ]
 };

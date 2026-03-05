@@ -17,7 +17,7 @@
         "hooks": [
           {
             "type": "prompt",
-            "prompt": "根据是否主动更新文档(执行/persistent-context)了评判此轮会话是否应该结束，概论对话状况如下: $ARGUMENTS. 如果有设计函数类型，参数，方法，新增函数、功能等内容没有被即使更新至文档，分析过后判断是否能退出，回复以下json内容\"{\\\"ok\\\": false|true, \\\"reason\\\": \\\"your explanation\\\"}\"false或者true由你自行判断是否文档处于最新状态能否结束对话来决定。这里提供一个例子{\\\"ok\\\": true, \\\"reason\\\": \\\"文档已经最新\\\"} 不要回复以外的任何词语，同时也不要解释"
+            "prompt": "根据是否主动更新文档(执行/persistent-context)了评判此轮会话是否应该结束，概论对话状况如下: $ARGUMENTS. 如果有设计函数类型，参数，方法、用户偏好、项目偏好、新增函数、功能等内容没有被即使更新至文档，分析过后判断是否能退出，如果可以退出回复以下json内容\"{\\\"ok\\\": true, \\\"reason\\\": \\\"文档已经最新\\\"}\"如果需要更新的话回复\"{\\\"ok\\\": false, \\\"reason\\\": \\\"/persistent-context <需要更新的部分>\\\"}\"不要回复以外的任何词语，同时也不要解释"
           }
         ]
       }
@@ -60,7 +60,7 @@ node scripts/install-hook.js --force
         "hooks": [
           {
             "type": "prompt",
-            "prompt": "根据是否主动更新文档(执行/persistent-context)了评判此轮会话是否应该结束，概论对话状况如下: $ARGUMENTS. 如果有设计函数类型，参数，方法，新增函数、功能等内容没有被即使更新至文档，分析过后判断是否能退出，回复以下json内容\"{\\\"ok\\\": false|true, \\\"reason\\\": \\\"your explanation\\\"}\"false或者true由你自行判断是否文档处于最新状态能否结束对话来决定。这里提供一个例子{\\\"ok\\\": true, \\\"reason\\\": \\\"文档已经最新\\\"} 不要回复以外的任何词语，同时也不要解释"
+            "prompt": "根据是否主动更新文档(执行/persistent-context)了评判此轮会话是否应该结束，概论对话状况如下: $ARGUMENTS. 如果有设计函数类型，参数，方法、用户偏好、项目偏好、新增函数、功能等内容没有被即使更新至文档，分析过后判断是否能退出，如果可以退出回复以下json内容\"{\\\"ok\\\": true, \\\"reason\\\": \\\"文档已经最新\\\"}\"如果需要更新的话回复\"{\\\"ok\\\": false, \\\"reason\\\": \\\"/persistent-context <需要更新的部分>\\\"}\"不要回复以外的任何词语，同时也不要解释"
           }
         ]
       }
@@ -75,29 +75,36 @@ node scripts/install-hook.js --force
 
 Prompt Hook 必须返回纯 JSON 格式，使用 `ok` 字段（boolean 类型）：
 
+**可以退出会话**：
 ```json
-{
-  "ok": true | false,
-  "reason": "解释原因（当 ok 为 false 时必须提供）"
-}
+{"ok": true, "reason": "文档已经最新"}
+```
+
+**需要更新文档**：
+```json
+{"ok": false, "reason": "/persistent-context <需要更新的部分>"}
 ```
 
 | 字段 | 类型 | 描述 |
 |------|------|------|
 | `ok` | boolean | `true` 允许结束会话，`false` 阻止结束 |
-| `reason` | string | 当 `ok` 为 `false` 时**必须**提供，向 Claude 显示的解释 |
+| `reason` | string | 解释原因；`ok` 为 `false` 时包含需要执行的命令 |
 
-**正确示例**：
-```json
-{"ok": true}
-{"ok": false, "reason": "请先执行 /persistent-context 更新文档"}
-```
+---
 
-**错误示例**（不会生效）：
-```json
-{"decision": "approve"}
-{"ok": "yes"}
-```
+## 检查项目
+
+Hook 会检查以下内容是否已更新到文档：
+
+| 检查项 | 说明 |
+|--------|------|
+| 函数类型 | 新增或修改的函数类型定义 |
+| 参数 | 函数/方法的参数变化 |
+| 方法 | 新增或修改的方法 |
+| 用户偏好 | 用户表达的使用偏好 |
+| 项目偏好 | 项目级别的配置偏好 |
+| 新增函数 | 新添加的函数 |
+| 功能 | 新增或修改的功能 |
 
 ---
 
@@ -117,12 +124,14 @@ Prompt Hook 必须返回纯 JSON 格式，使用 `ok` 字段（boolean 类型）
 │  3. LLM 分析会话内容：                               │
 │     ├── 是否执行了 /persistent-context？            │
 │     ├── 是否有未记录的函数/方法变更？                │
+│     ├── 是否有未记录的用户/项目偏好？                │
 │     └── 是否有未记录的架构决策？                     │
 │         │                                          │
 │         ▼                                          │
 │  4. 返回判断结果：                                   │
-│     ├── {"ok": true} → 允许结束                     │
-│     └── {"ok": false, "reason": "..."} → 阻止结束   │
+│     ├── {"ok": true, "reason": "文档已经最新"}       │
+│     └── {"ok": false, "reason": "/persistent-context │
+│           <需要更新的部分>"}                         │
 │                                                     │
 └─────────────────────────────────────────────────────┘
 ```
@@ -136,7 +145,7 @@ Prompt Hook 必须返回纯 JSON 格式，使用 `ok` 字段（boolean 类型）
 **原因**：Hook 检测到会话中有未记录的变更
 
 **解决方案**：
-1. 执行 `/persistent-context` 更新文档
+1. 执行 Hook 提示的命令，如 `/persistent-context 用户偏好`
 2. 然后再次尝试结束会话
 
 ### Schema validation failed: expected boolean, received undefined
@@ -144,7 +153,7 @@ Prompt Hook 必须返回纯 JSON 格式，使用 `ok` 字段（boolean 类型）
 **原因**：LLM 返回的 JSON 中 `ok` 字段缺失或类型错误
 
 **解决方案**：
-1. 确保 prompt 中明确要求返回 `{"ok": true}` 或 `{"ok": false, "reason": "..."}`
+1. 确保 prompt 中明确要求返回 `{"ok": true}` 或 `{"ok": false, ...}`
 2. 强调 `ok` 必须是 boolean 类型（不是字符串）
 
 ### JSON validation failed
@@ -152,7 +161,7 @@ Prompt Hook 必须返回纯 JSON 格式，使用 `ok` 字段（boolean 类型）
 **原因**：Prompt Hook 的 LLM 响应不是纯 JSON
 
 **解决方案**：
-1. 在 prompt 中强调 "Return ONLY valid JSON, no other text"
+1. 在 prompt 中强调 "不要回复以外的任何词语，同时也不要解释"
 2. 检查 prompt 内容是否正确配置
 
 ---
@@ -182,4 +191,4 @@ Prompt Hook 必须返回纯 JSON 格式，使用 `ok` 字段（boolean 类型）
 
 *此 Hook 配合 `persistent-context` SKILL 和 `memory-loading` Rule 使用*
 
-*最后更新: 2026-03-04*
+*最后更新: 2026-03-05*

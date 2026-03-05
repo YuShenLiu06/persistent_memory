@@ -67,13 +67,6 @@ node scripts/install-hook.js
 - 需要记录架构决策
 - 需要维护文档索引
 
-### 手动命令
-
-| 命令 | 说明 |
-|------|------|
-| `/update-memory` | 手动触发文档更新检查 |
-| `/record-refactor` | 记录大型重构变更 |
-
 ### 使用示例
 
 ```bash
